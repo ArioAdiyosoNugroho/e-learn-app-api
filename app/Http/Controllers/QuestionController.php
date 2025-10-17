@@ -50,7 +50,8 @@ class QuestionController extends Controller
      */
     public function show(question $question)
     {
-        //
+        $question = question::with('quiz', 'options', 'correctOption')->findOrFail($question->id);
+        return response()->json($question);
     }
 
     /**
@@ -66,7 +67,20 @@ class QuestionController extends Controller
      */
     public function update(Request $request, question $question)
     {
-        //
+        $question = question::findOrFail($question->id);
+        $validate = $request->validate([
+            'quiz_id' => 'sometimes|exists:quizzes,id',
+            'question'    => 'sometimes|string',
+            'type'    => 'sometimes|in:multiple_choice,true_false,essay',
+            'correct_option_id' => 'nullable|exists:question_options,id',
+        ]);
+
+        $question->update($validate);
+
+        return response()->json([
+            'message' => 'Question updated successfully',
+            'data'    => $question
+        ]);
     }
 
     /**
@@ -74,6 +88,11 @@ class QuestionController extends Controller
      */
     public function destroy(question $question)
     {
-        //
+        $question = question::findOrFail($question->id);
+        $question->delete();
+
+        return response()->json([
+            'message' => 'Question deleted successfully'
+        ]);
     }
 }
