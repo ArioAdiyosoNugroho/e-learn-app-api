@@ -3,7 +3,9 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\MateriController;
+use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\QuizController;
+use App\Models\question;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -29,7 +31,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // proses dulu ygy
     // =====Questions======
-    Route::apiResource('question', QuizController::class);
+    Route::apiResource('question', QuestionController::class);
     // =====Results=======
     Route::apiResource('result', QuizController::class);
     // =====Answers=======

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\materi;
 use App\Models\question;
 use Illuminate\Http\Request;
 
@@ -12,7 +13,8 @@ class QuestionController extends Controller
      */
     public function index()
     {
-        //
+        $question = question::with('quiz', 'options', 'correctOption')->get();
+        return response()->json($question);
     }
 
     /**
@@ -28,7 +30,19 @@ class QuestionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validate = $request->validate([
+            'quiz_id' => 'required|exists:quizzes,id',
+            'question'    => 'required|string',
+            'type'    => 'required|in:multiple_choice,true_false,essay',
+            'correct_option_id' => 'nullable|exists:question_options,id',
+        ]);
+
+        $question = question::create($validate);
+
+        return response()->json([
+            'message' => 'Question created successfully',
+            'data'    => $question
+        ], 201);
     }
 
     /**
