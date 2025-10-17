@@ -32,10 +32,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // proses dulu ygy
     // =====Questions======
     Route::apiResource('question', QuestionController::class);
+    // =====questions options=======
+    Route::apiResource('question-option', QuizController::class);
     // =====Results=======
     Route::apiResource('result', QuizController::class);
     // =====Answers=======
     Route::apiResource('answer', QuizController::class);
-    // =====questions options=======
-    Route::apiResource('question-option', QuizController::class);
 });

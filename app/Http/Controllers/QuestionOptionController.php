@@ -12,7 +12,12 @@ class QuestionOptionController extends Controller
      */
     public function index()
     {
-        //
+        $question_id = request()->query('question_id');
+        if($question_id) {
+            return response()->json(question_option::where('question_id', $question_id)->get());
+        }
+
+        return response()->json(question_option::all());
     }
 
     /**
@@ -28,7 +33,18 @@ class QuestionOptionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'question_id' => 'required|exists:questions,id',
+            'option_label' => 'required|string|max:5',
+            'option_text'  => 'required|string',
+        ]);
+        $option = question_option::create($request->all());
+
+        return response()->json([
+            'message' => 'Question option created successfully',
+            'data'    => $option
+        ],201);
+
     }
 
     /**
@@ -36,7 +52,8 @@ class QuestionOptionController extends Controller
      */
     public function show(question_option $question_option)
     {
-        //
+        $option = question_option::findOrFail($question_option->id);
+        return response()->json($option);
     }
 
     /**
@@ -52,7 +69,19 @@ class QuestionOptionController extends Controller
      */
     public function update(Request $request, question_option $question_option)
     {
-        //
+        $option = question_option::findOrFail($question_option->id);
+
+        $request->validate([
+            'option_label' => 'string|max:5',
+            'option_text'  => 'string',
+        ]);
+
+        $option->update($request->all());
+
+        return response()->json([
+            'message' => 'Question option updated successfully',
+            'data'    => $option
+        ]);
     }
 
     /**
@@ -60,6 +89,11 @@ class QuestionOptionController extends Controller
      */
     public function destroy(question_option $question_option)
     {
-        //
+        $option = question_option::findOrFail($question_option->id);
+        $option->delete();
+
+        return response()->json([
+            'message' => 'Question option deleted successfully'
+        ]);
     }
 }
