@@ -71,7 +71,7 @@ class QuestionController extends Controller
         $validate = $request->validate([
             'quiz_id' => 'sometimes|exists:quizzes,id',
             'question'    => 'sometimes|string',
-            'type'    => 'sometimes|in:multiple_choice,true_false,essay',
+            'type'    => 'sometimes|in:multiple_cqhoice,true_false,essay',
             'correct_option_id' => 'nullable|exists:question_options,id',
         ]);
 
