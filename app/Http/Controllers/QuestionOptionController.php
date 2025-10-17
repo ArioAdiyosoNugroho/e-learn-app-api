@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\question;
 use App\Models\question_option;
 use Illuminate\Http\Request;
 
@@ -33,6 +34,20 @@ class QuestionOptionController extends Controller
      */
     public function store(Request $request)
     {
+        $question = question::findOrFail($request->question_id);
+
+        if($question->type === 'essay'){
+            return response()->json([
+                'message' => 'Cannot add options to an essay question'
+            ], 400);
+        }
+
+        if($question->type === 'true_false' && !in_array($request->option_text,['true' , 'false'] )){
+            return response()->json([
+                "error" => 'Request only accept "True" or "False" as options'
+            ],400);
+        }
+
         $request->validate([
             'question_id' => 'required|exists:questions,id',
             'option_label' => 'required|string|max:5',
