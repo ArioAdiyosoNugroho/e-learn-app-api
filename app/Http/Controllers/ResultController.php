@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\answer;
+use App\Models\question;
 use App\Models\result;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -35,39 +36,55 @@ class ResultController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'quiz_id' =>'required|exists:quizzes,id',
+            'quiz_id' => 'required|exists:quizzes,id'
         ]);
 
+        $userId = Auth::id();
         $quizId = $request->quiz_id;
 
-        //ngitung
-        $answers = answer::where('user_id', Auth::id())
-        ->whereHas('question', function($q) use ($quizId){
-            $q->where('quiz_id', $quizId);
-        })->get();
+        // ambil semua soal di quiz
+        $questions = question::where('quiz_id', $quizId)->get();
+        $totalQuestions = $questions->count();
 
-        $totalQuestions  = $answers->count();
-        $correctAnswers  = $answers->where('is_correct', true)->count();
-        $score           = $totalQuestions > 0 ? round(($correctAnswers / $totalQuestions) * 100) : 0;
+        // ambil semua jawaban user untuk quiz ini
+        $answers = Answer::where('user_id', $userId)
+            ->whereIn('question_id', $questions->pluck('id'))
+            ->get();
 
-        // Simpan / update result
+        $correctAnswers = $answers->where('is_correct', true)->count();
+        $wrongAnswers   = $totalQuestions - $correctAnswers;
+
+        // hitung score (%)
+        $score = $totalQuestions > 0 ? round(($correctAnswers / $totalQuestions) * 100) : 0;
+
+        // simpan ke tabel results
         $result = Result::updateOrCreate(
             [
-                'user_id' => Auth::id(),
+                'user_id' => $userId,
                 'quiz_id' => $quizId,
             ],
             [
-                'total_questions' => $totalQuestions,
-                'correct_answers' => $correctAnswers,
-                'score'           => $score,
+                'score' => $score,
+                'completed_at' => now()
             ]
         );
 
         return response()->json([
             'message' => 'Hasil quiz berhasil dihitung',
-            'data'    => $result
+            'data' => [
+                'id' => $result->id,
+                'user_id' => $userId,
+                'quiz_id' => $quizId,
+                'score' => $score,
+                'total_questions' => $totalQuestions,
+                'correct_answers' => $correctAnswers,
+                'wrong_answers' => $wrongAnswers,
+                'created_at' => $result->created_at,
+                'updated_at' => $result->updated_at,
+            ]
         ]);
     }
+
 
     /**
      * Display the specified resource.
