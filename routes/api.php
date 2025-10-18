@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AnswerController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\MateriController;
@@ -38,5 +39,5 @@ Route::middleware('auth:sanctum')->group(function () {
     // =====Results=======
     Route::apiResource('result', QuizController::class);
     // =====Answers=======
-    Route::apiResource('answer', QuizController::class);
+    Route::apiResource('answer', AnswerController::class);
 });
