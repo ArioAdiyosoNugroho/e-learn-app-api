@@ -7,6 +7,7 @@ use App\Http\Controllers\MateriController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\QuestionOptionController;
 use App\Http\Controllers\QuizController;
+use App\Http\Controllers\ResultController;
 use App\Models\question;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -37,7 +38,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // =====questions options=======
     Route::apiResource('question-option', QuestionOptionController::class);
     // =====Results=======
-    Route::apiResource('result', QuizController::class);
+    Route::apiResource('result', ResultController::class);
     // =====Answers=======
     Route::apiResource('answer', AnswerController::class);
 });
