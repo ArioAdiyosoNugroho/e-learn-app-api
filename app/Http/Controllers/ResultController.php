@@ -15,14 +15,14 @@ class ResultController extends Controller
      */
     public function index()
     {
-    $results = Result::with(['quiz', 'user']) 
-        ->where('user_id', Auth::id())
-        ->get();
+        $results = Result::with(['quiz', 'user'])
+            ->where('user_id', Auth::id())
+            ->get();
 
-    return response()->json([
-        'message' => 'Riwayat hasil quiz',
-        'data' => $results
-    ]);
+        return response()->json([
+            'message' => 'Riwayat hasil quiz',
+            'data' => $results
+        ]);
     }
 
     /**
