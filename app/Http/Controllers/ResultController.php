@@ -15,11 +15,14 @@ class ResultController extends Controller
      */
     public function index()
     {
-        $result = result::with('user_id',Auth::id())
-        ->with('quiz')
+    $results = Result::with(['quiz', 'user']) 
+        ->where('user_id', Auth::id())
         ->get();
 
-        return response()->json($result);
+    return response()->json([
+        'message' => 'Riwayat hasil quiz',
+        'data' => $results
+    ]);
     }
 
     /**
@@ -42,11 +45,9 @@ class ResultController extends Controller
         $userId = Auth::id();
         $quizId = $request->quiz_id;
 
-        // ambil semua soal di quiz
         $questions = question::where('quiz_id', $quizId)->get();
         $totalQuestions = $questions->count();
 
-        // ambil semua jawaban user untuk quiz ini
         $answers = Answer::where('user_id', $userId)
             ->whereIn('question_id', $questions->pluck('id'))
             ->get();
@@ -54,10 +55,8 @@ class ResultController extends Controller
         $correctAnswers = $answers->where('is_correct', true)->count();
         $wrongAnswers   = $totalQuestions - $correctAnswers;
 
-        // hitung score (%)
         $score = $totalQuestions > 0 ? round(($correctAnswers / $totalQuestions) * 100) : 0;
 
-        // simpan ke tabel results
         $result = Result::updateOrCreate(
             [
                 'user_id' => $userId,
